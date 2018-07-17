@@ -3,7 +3,7 @@
 # @Email:  nmartelaro@gmail.com
 # @Filename: createClips.py
 # @Last modified by:   nikmart
-# @Last modified time: 2018-02-01T22:33:55-05:00
+# @Last modified time: 2018-07-17T13:53:55-05:00
 
 # Purpose: Create video clips based on the time markers provides in a CSV file.
 # Settings: clip time, participant name
