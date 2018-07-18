@@ -21,13 +21,23 @@ TIME = 0
 # FUNCTIOINS
 def create_clip(video, participant, cut_in, duration, timestamp, out_dir):
     print("Cutting from {} to {}".format(cut_in, cut_in + duration))
-    # run an ffmpeg thread to create MP4 clips
-    mp4 = 'ffmpeg -ss ' + str(cut_in) + \
-        ' -i ' + video + \
-        ' -t ' + str(duration) + \
-        ' -movflags faststart -vcodec copy -acodec copy {}/{}_{}.mov'.format(out_dir, participant, timestamp)
-    print(mp4)
-    os.system(mp4)
+    if format == "h264":
+        # run an ffmpeg thread to create MP4 clips
+        mp4 = 'ffmpeg -ss ' + str(cut_in) + \
+            ' -i ' + video + \
+            ' -t ' + str(duration) + \
+            ' -movflags faststart {}/{}_{}.mov'.format(out_dir, participant, timestamp)
+        print(mp4)
+        os.system(mp4)
+
+    if format == "mjpeg":
+        # run an ffmpeg thread to create MP4 clips
+        mjpeg = 'ffmpeg -ss ' + str(cut_in) + \
+            ' -i ' + video + \
+            ' -t ' + str(duration) + \
+            ' -c:v mjpeg -q:v 2 {}/{}_{}.mov'.format(out_dir, participant, timestamp)
+        print(mjpeg)
+        os.system(mjpeg)
 
 def getQueries(df_file):
     df = pd.read_csv(df_file)
@@ -48,11 +58,14 @@ ap.add_argument("-a", "--after", type=float, required=True,
     help="number of seconds to cut after a query")
 ap.add_argument("-o", "--output", required=True,
     help="name of output directory for clips")
+ap.add_argument("-f", "--format", required=False, default="mjpeg",
+    help="video format: h264 or mjpeg")
 args = vars(ap.parse_args())
 directory = args["directory"]
 before = args["before"]
 after = args["after"]
 output = args["output"]
+format = args["format"]
 
 # Change into the main data directory
 os.chdir(directory)
