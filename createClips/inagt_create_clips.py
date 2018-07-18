@@ -41,10 +41,12 @@ def create_clip(video, participant, cut_in, duration, timestamp, out_dir):
 
 def getQueries(df_file):
     df = pd.read_csv(df_file)
+    all_time = pd.DatetimeIndex(df.timestamp).astype(np.int64) / 10**9
+    start = all_time[0]
     queries = df.query('response==1')
     times = pd.DatetimeIndex(queries.timestamp)
     times = times.astype(np.int64) / 10**9
-    return times
+    return times, start
 
 
 # SCRIPT
@@ -78,8 +80,7 @@ for participant in participants:
     # Get the video file, start time, and query time filenames
     try:
         video = glob.glob("{}/*.mov".format(participant,participant))[0]
-        queries = getQueries(glob.glob("{}/*.csv".format(participant))[0])
-        start = glob.glob("{}/*_videoStart.txt".format(participant))[0]
+        queries, startTime = getQueries(glob.glob("{}/*.csv".format(participant))[0])
         print(video, queries, start)
     except:
         print("{} directory error, skipping".format(participant))
@@ -95,12 +96,12 @@ for participant in participants:
         pass
 
 
-    # Get the start time from the second line of the file
-    with open(start, 'r') as f:
-        for line in f:
-            x = line
-        startTime = float(x.split(': ')[-1])
-        print("startime = {}".format(startTime))
+    # # Get the start time from the second line of the file
+    # with open(start, 'r') as f:
+    #     for line in f:
+    #         x = line
+    #     startTime = float(x.split(': ')[-1])
+    print("startime = {}".format(startTime))
 
     # Find all the cut points and create the clips
     linenum = 0
