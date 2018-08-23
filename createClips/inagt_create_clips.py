@@ -62,12 +62,15 @@ ap.add_argument("-o", "--output", required=True,
     help="name of output directory for clips")
 ap.add_argument("-f", "--format", required=False, default="mjpeg",
     help="video format: h264 or mjpeg")
+ap.add_argument("-m", "--move", required=False, default=0,
+    help="number of seconds to offset the start time of a clip - only useful for something that is not syncronized")
 args = vars(ap.parse_args())
 directory = args["directory"]
 before = args["before"]
 after = args["after"]
 output = args["output"]
 format = args["format"]
+offset = float(args["move"])
 
 # Change into the main data directory
 os.chdir(directory)
@@ -81,7 +84,7 @@ for participant in participants:
     try:
         video = glob.glob("{}/*.mov".format(participant,participant))[0]
         queries, startTime = getQueries(glob.glob("{}/*.csv".format(participant))[0])
-        print(video, queries, start)
+        print(video, queries, startTime)
     except:
         print("{} directory error, skipping".format(participant))
         pass
@@ -106,7 +109,7 @@ for participant in participants:
     # Find all the cut points and create the clips
     linenum = 0
     for timestamp in queries:
-        question_time = timestamp - startTime
+        question_time = timestamp - startTime + offset
         cut_time = question_time - before
         create_clip(video, participant, cut_time, before + after, timestamp, output_dir) # clipped before and after the question is asked
         linenum += 1
